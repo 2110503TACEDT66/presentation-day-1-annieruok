@@ -10,7 +10,7 @@ exports.getBookings = async(req,res,next)=>{
     if(req.user.role !== 'admin'){
         query = Booking.find({user: req.user.id}).populate({
             path: 'company',
-            select: 'name province tel'
+            select: 'name province tel website'
         });
     } else { // Admin can see all appointments
         
@@ -18,12 +18,12 @@ exports.getBookings = async(req,res,next)=>{
             console.log(req.params.companyIdId);
             query = Booking.find({company: req.params.companyId}).populate({
                 path: 'company',
-                select: 'name province tel'
+                select: 'name province tel website'
             });
         } else {
             query = Booking.find().populate({
                 path: 'company',
-                select: 'name province tel'
+                select: 'name province tel website'
             });
         }
     }
@@ -47,7 +47,7 @@ exports.getBooking = async(req,res,next)=>{
     try {
         const booking = await Booking.findById(req.params.id).populate({
             path: 'company',
-            select: 'name description tel'
+            select: 'name description tel website'
         });
         if(!booking){
             return res.status(404).json({success:false, message : `No booking with the id of ${req.params.id}`})
