@@ -1,5 +1,4 @@
 const Company = require('../models/Company');
-const VacCenter = require('../models/vacCenter');
 //@desc Get all hospitals
 //@route GET /api/v1/hospitals
 //@access Public
@@ -142,16 +141,3 @@ exports.deleteCompany= async(req,res,next)=>{
     }
 };
 
-//@desc Get all vaccine centers
-//@route GET /api/v1/hospitals/vacCenters
-//@access Public
-exports.getVacCenters= (req,res,next)=>{
-    VacCenter.getAll((err, data) => {
-        if (err)
-            res.status(500).send({
-                message:
-                    err.message || "Some error occurred while retrieving Vaccine Centers."
-            });
-        else res.send(data);
-    });
-}
