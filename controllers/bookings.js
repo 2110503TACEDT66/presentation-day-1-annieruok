@@ -76,6 +76,16 @@ exports.addBooking = async(req,res,next)=>{
                 message : `No company with the id of ${req.params.companyId}`
             });
         }
+
+        //Book date invalid
+        const bookDate = new Date(req.body.bookDate);
+
+        if(bookDate >= new Date("2022-05-14T00:00:00.000Z") || bookDate < new Date("2022-05-10T00:00:00.000Z")){
+            return res.status(400).json({success:false, 
+                message : "Date must be between 10-13th May"
+            });
+        }
+
         // add user Id to req.body
         req.body.user = req.user.id;
         
