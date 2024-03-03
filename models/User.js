@@ -30,8 +30,8 @@ const UserSchema=new mongoose.Schema({
         minlength:6,
         select:false
     },
-    resetPasswordToken:String,
-    resetPasswordExpire:Date,
+    resetPasswordCode: String, // Added for the 4-digit reset code
+    resetPasswordExpire: Date, // Added for the reset code expiration
     createdAt:{
         type:Date,
         default:Date.now
