@@ -108,3 +108,66 @@ exports.getMe = async (req, res, next) => {
         data: user 
     });
 };
+
+exports.requestPasswordReset = async (req, res) => {
+    const { email } = req.body;
+    try {
+       
+        const user = await User.findOne({ email });
+
+       
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+     
+        const resetCode = Math.floor(1000 + Math.random() * 9000).toString();
+
+       
+        user.resetPasswordCode = resetCode; 
+        user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; 
+        await user.save();
+
+        
+        console.log(`Reset code for ${user.email} is: ${resetCode}`);
+
+       
+        res.status(200).json({ success: true, message: 'Reset code generated and sent to the user' });
+    } catch (err) {
+       
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
+
+const bcrypt = require('bcryptjs'); 
+
+exports.resetPassword = async (req, res) => {
+    const { email, resetCode, newPassword } = req.body;
+    try {
+        // Find the user by email
+        const user = await User.findOne({ email });
+
+        // Check if the reset code matches and hasn't expired
+        if (!user || user.resetPasswordCode !== resetCode || user.resetPasswordExpire < Date.now()) {
+            return res.status(400).json({ success: false, message: 'Invalid or expired reset code' });
+        }
+
+        // Hash the new password before saving it (using bcryptjs)
+       
+        user.password = newPassword;
+
+        // Clear the reset code and expiration date from the user's account
+        user.resetPasswordCode = undefined;
+        user.resetPasswordExpire = undefined;
+
+        // Save the user's new password and reset the code information
+        await user.save();
+
+        // Respond with a success message
+        res.status(200).json({ success: true, message: 'Password has been reset successfully.' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
