@@ -91,11 +91,17 @@ exports.addBooking = async(req,res,next)=>{
         
         // Check for existed appointment
         const existedBookings = await Booking.find({ user: req.user.id });
-
+        
         // If the user is not an admin, they can only create 3 appointment.
         if (existedBookings.length >= 3 && req.user.role !== 'admin' ) {
             return res.status(400).json({ success: false, message: `The user with ID ${req.user.id} has already made 3 bookings` });
         }
+        //Limit 1 booking per day
+        const limit1DayBooking = await Booking.find({ user: req.user.id, bookDate: { $gte: new Date(req.body.bookDate), $lt: new Date(req.body.bookDate).setHours(24, 0, 0, 0) } });
+        if (limit1DayBooking.length >= 1) {
+            return res.status(400).json({ success: false, message: `The user with ID ${req.user.id} has already made a booking for this date` });
+        }
+        
 
         const booking = await Booking.create(req.body);
 
